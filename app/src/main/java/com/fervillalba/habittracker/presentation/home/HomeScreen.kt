@@ -45,7 +45,7 @@ fun HomeScreen(
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
-            snackbarHostState.showSnackbar(it.asString(context))
+            snackbarHostState.showSnackbar(it)
             viewModel.clearError()
         }
     }
@@ -111,6 +111,7 @@ fun HomeScreen(
                     ) { habit ->
                         HabitItem(
                             habit = habit,
+                            isCompleted = habit.id in uiState.completedHabitIds,
                             onComplete = { viewModel.completeHabit(habit.id) }
                         )
                     }
