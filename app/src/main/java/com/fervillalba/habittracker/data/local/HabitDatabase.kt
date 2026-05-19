@@ -2,10 +2,11 @@ package com.fervillalba.habittracker.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.fervillalba.habittracker.Constants
 
 @Database(
     entities = [HabitEntity::class, HabitLogEntity::class],
-    version = 1,
+    version = Constants.DATABASE_VERSION,
     exportSchema = false
 )
 abstract class HabitDatabase : RoomDatabase() {

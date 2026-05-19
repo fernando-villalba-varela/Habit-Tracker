@@ -24,8 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.fervillalba.habittracker.Constants
+import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.HabitFrequency
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,12 +41,12 @@ fun CreateHabitScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Nuevo hábito") },
+                title = { Text(stringResource(R.string.new_habit_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = stringResource(R.string.back_content_desc)
                         )
                     }
                 }
@@ -55,30 +57,30 @@ fun CreateHabitScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(Constants.Dimens.PaddingMedium)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingLarge)
         ) {
             OutlinedTextField(
                 value = uiState.name,
                 onValueChange = viewModel::onNameChange,
-                label = { Text("Nombre del hábito") },
-                placeholder = { Text("Ej: Correr 20 minutos") },
+                label = { Text(stringResource(R.string.habit_name_label)) },
+                placeholder = { Text(stringResource(R.string.habit_name_placeholder)) },
                 isError = uiState.nameError != null,
                 supportingText = {
-                    uiState.nameError?.let { Text(it) }
+                    uiState.nameError?.let { Text(it.asString()) }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
             Text(
-                text = "Emoji",
+                text = stringResource(R.string.emoji_label),
                 style = MaterialTheme.typography.labelLarge
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("✅", "🏃", "📚", "💧", "🎯", "💪", "🧘", "🍎").forEach { emoji ->
+            Row(horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)) {
+                Constants.EMOJI_OPTIONS.forEach { emoji ->
                     FilterChip(
                         selected = uiState.iconEmoji == emoji,
                         onClick = { viewModel.onEmojiChange(emoji) },
@@ -88,11 +90,11 @@ fun CreateHabitScreen(
             }
 
             Text(
-                text = "Frecuencia",
+                text = stringResource(R.string.frequency_label),
                 style = MaterialTheme.typography.labelLarge
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)) {
                 HabitFrequency.entries.forEach { frequency ->
                     FilterChip(
                         selected = uiState.frequency == frequency,
@@ -100,9 +102,9 @@ fun CreateHabitScreen(
                         label = {
                             Text(
                                 when (frequency) {
-                                    HabitFrequency.DAILY -> "Diario"
-                                    HabitFrequency.WEEKDAYS -> "Laboral"
-                                    HabitFrequency.WEEKENDS -> "Fin de semana"
+                                    HabitFrequency.DAILY -> stringResource(R.string.frequency_daily)
+                                    HabitFrequency.WEEKDAYS -> stringResource(R.string.frequency_weekdays)
+                                    HabitFrequency.WEEKENDS -> stringResource(R.string.frequency_weekends)
                                 }
                             )
                         }
@@ -115,7 +117,7 @@ fun CreateHabitScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading
             ) {
-                Text("Crear hábito")
+                Text(stringResource(R.string.create_habit_button))
             }
         }
     }

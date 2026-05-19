@@ -2,10 +2,9 @@ package com.fervillalba.habittracker.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fervillalba.habittracker.domain.model.Habit
-import com.fervillalba.habittracker.domain.model.HabitLog
 import com.fervillalba.habittracker.domain.usecase.CompleteHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.GetHabitsUseCase
+import com.fervillalba.habittracker.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +40,9 @@ class HomeViewModel @Inject constructor(
                 completeHabitUseCase(habitId)
                 _uiState.update { it.copy(completedHabitId = habitId) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { 
+                    it.copy(error = e.message?.let { msg -> UiText.DynamicString(msg) }) 
+                }
             }
         }
     }

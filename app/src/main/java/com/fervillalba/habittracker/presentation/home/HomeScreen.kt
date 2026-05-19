@@ -27,7 +27,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.fervillalba.habittracker.Constants
+import com.fervillalba.habittracker.R
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,10 +41,11 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it.asString(context))
             viewModel.clearError()
         }
     }
@@ -49,12 +53,15 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mis hábitos") }
+                title = { Text(stringResource(R.string.home_title)) }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToCreate) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir hábito")
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_habit_content_desc)
+                )
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -77,14 +84,14 @@ fun HomeScreen(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)
                     ) {
                         Text(
-                            text = "No tienes hábitos todavía",
+                            text = stringResource(R.string.no_habits_yet),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = "Pulsa + para crear tu primer hábito",
+                            text = stringResource(R.string.click_to_create_first),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -95,8 +102,8 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(Constants.Dimens.PaddingMedium),
+                    verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)
                 ) {
                     items(
                         items = uiState.habits,

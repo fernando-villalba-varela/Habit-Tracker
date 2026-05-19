@@ -2,9 +2,11 @@ package com.fervillalba.habittracker.presentation.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
 import com.fervillalba.habittracker.domain.model.HabitFrequency
 import com.fervillalba.habittracker.domain.usecase.CreateHabitUseCase
+import com.fervillalba.habittracker.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +39,9 @@ class CreateHabitViewModel @Inject constructor(
         val state = _uiState.value
 
         if (state.name.isBlank()) {
-            _uiState.update { it.copy(nameError = "El nombre no puede estar vacío") }
+            _uiState.update { 
+                it.copy(nameError = UiText.StringResource(R.string.error_empty_name)) 
+            }
             return
         }
 
@@ -53,7 +57,12 @@ class CreateHabitViewModel @Inject constructor(
                 )
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message, isLoading = false) }
+                _uiState.update { 
+                    it.copy(
+                        error = e.message?.let { msg -> UiText.DynamicString(msg) }, 
+                        isLoading = false
+                    ) 
+                }
             }
         }
     }

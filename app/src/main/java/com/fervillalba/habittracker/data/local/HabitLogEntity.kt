@@ -4,8 +4,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
+import com.fervillalba.habittracker.Constants
+
 @Entity(
-    tableName = "habit_logs",
+    tableName = Constants.TABLE_HABIT_LOGS,
     foreignKeys = [ForeignKey(
         entity = HabitEntity::class,
         parentColumns = ["id"],

@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Habit Tracker</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Mis hábitos</string>
+    <string name="add_habit_content_desc">Añadir hábito</string>
+    <string name="no_habits_yet">No tienes hábitos todavía</string>
+    <string name="click_to_create_first">Pulsa + para crear tu primer hábito</string>
+    <string name="complete_habit_content_desc">Completar hábito</string>
+
+    <!-- Create Habit Screen -->
+    <string name="new_habit_title">Nuevo hábito</string>
+    <string name="back_content_desc">Volver</string>
+    <string name="habit_name_label">Nombre del hábito</string>
+    <string name="habit_name_placeholder">Ej: Correr 20 minutos</string>
+    <string name="emoji_label">Emoji</string>
+    <string name="frequency_label">Frecuencia</string>
+    <string name="frequency_daily">Diario</string>
+    <string name="frequency_weekdays">Laboral</string>
+    <string name="frequency_weekends">Fin de semana</string>
+    <string name="create_habit_button">Crear hábito</string>
+
+    <!-- Errors -->
+    <string name="error_empty_name">El nombre no puede estar vacío</string>
 </resources>

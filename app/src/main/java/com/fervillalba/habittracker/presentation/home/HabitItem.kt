@@ -15,7 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.fervillalba.habittracker.Constants
+import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
 
 @Composable
@@ -30,12 +32,12 @@ fun HabitItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(Constants.Dimens.PaddingMedium),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingMedium),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -50,8 +52,8 @@ fun HabitItem(
             IconButton(onClick = onComplete) {
                 Icon(
                     imageVector = Icons.Outlined.CheckCircle,
-                    contentDescription = "Completar hábito",
-                    modifier = Modifier.size(32.dp),
+                    contentDescription = stringResource(R.string.complete_habit_content_desc),
+                    modifier = Modifier.size(Constants.Dimens.IconSizeMedium),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
