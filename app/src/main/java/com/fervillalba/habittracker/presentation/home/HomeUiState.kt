@@ -7,5 +7,6 @@ data class HomeUiState(
     val completedHabitIds: Set<Long> = emptySet(),
     val isLoading: Boolean = true,
     val error: String? = null,
-    val completedHabitId: Long? = null
+    val completedHabitId: Long? = null,
+    val deletedHabitMessage: String? = null
 )

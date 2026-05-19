@@ -16,8 +16,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -27,10 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.fervillalba.habittracker.Constants
-import com.fervillalba.habittracker.R
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +40,6 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -50,18 +48,30 @@ fun HomeScreen(
         }
     }
 
+    LaunchedEffect(uiState.deletedHabitMessage) {
+        uiState.deletedHabitMessage?.let {
+            val result = snackbarHostState.showSnackbar(
+                message = it,
+                actionLabel = "Deshacer",
+                duration = SnackbarDuration.Short
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.undoDelete()
+            } else {
+                viewModel.clearDeletedMessage()
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.home_title)) }
+                title = { Text("Mis hábitos") }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToCreate) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_habit_content_desc)
-                )
+                Icon(Icons.Default.Add, contentDescription = "Añadir hábito")
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -84,14 +94,14 @@ fun HomeScreen(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.no_habits_yet),
+                            text = "No tienes hábitos todavía",
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = stringResource(R.string.click_to_create_first),
+                            text = "Pulsa + para crear tu primer hábito",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -102,8 +112,8 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentPadding = PaddingValues(Constants.Dimens.PaddingMedium),
-                    verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(
                         items = uiState.habits,
@@ -112,7 +122,8 @@ fun HomeScreen(
                         HabitItem(
                             habit = habit,
                             isCompleted = habit.id in uiState.completedHabitIds,
-                            onComplete = { viewModel.completeHabit(habit.id) }
+                            onComplete = { viewModel.completeHabit(habit.id) },
+                            onDelete = { viewModel.deleteHabit(habit) }
                         )
                     }
                 }
