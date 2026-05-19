@@ -22,4 +22,7 @@
 
     <!-- Errors -->
     <string name="error_empty_name">El nombre no puede estar vacío</string>
+
+    <!-- widget -->
+    <string name="widget_description">Muestra tus hábitos del día</string>
 </resources>

@@ -16,6 +16,7 @@ lifecycleViewmodelCompose = "2.7.0"
 workManager = "2.9.0"
 hilt = "2.59.2"
 hiltNavigationCompose = "1.2.0"
+glance = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +49,8 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", v
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 hilt-work = { group = "androidx.hilt", name = "hilt-work", version = "1.2.0" }
 hilt-work-compiler = { group = "androidx.hilt", name = "hilt-compiler", version = "1.2.0" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
