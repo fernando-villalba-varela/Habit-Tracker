@@ -62,4 +62,8 @@ class HabitRepositoryImpl(
         calendar.set(java.util.Calendar.MILLISECOND, 0)
         return calendar.timeInMillis
     }
+
+    override suspend fun getActiveHabitsOnce(): List<Habit> {
+        return dao.getActiveHabitsOnce().map { it.toDomain() }
+    }
 }

@@ -37,4 +37,6 @@ interface HabitDao {
 
     @Delete
     suspend fun deleteHabitLog(log: HabitLogEntity)
+    @Query("SELECT * FROM habits WHERE isActive = 1 ORDER BY createdAt ASC")
+    suspend fun getActiveHabitsOnce(): List<HabitEntity>
 }

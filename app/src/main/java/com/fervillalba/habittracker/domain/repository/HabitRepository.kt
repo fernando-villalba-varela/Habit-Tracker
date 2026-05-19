@@ -14,4 +14,5 @@ interface HabitRepository {
     suspend fun getLogsForHabit(habitId: Long): List<HabitLog>
     suspend fun getLogsForDate(dateMillis: Long): List<HabitLog>
     suspend fun deleteHabitLog(habitLog: HabitLog)
+    suspend fun getActiveHabitsOnce(): List<Habit>
 }
