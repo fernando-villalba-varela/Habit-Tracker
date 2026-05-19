@@ -5,13 +5,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.presentation.create.CreateHabitScreen
 import com.fervillalba.habittracker.presentation.home.HomeScreen
+import com.fervillalba.habittracker.presentation.stats.StatsScreen
 
 sealed class Screen(val route: String) {
-    object Home : Screen(Constants.ROUTE_HOME)
-    object CreateHabit : Screen(Constants.ROUTE_CREATE_HABIT)
+    object Home : Screen("home")
+    object CreateHabit : Screen("create_habit")
+    object Stats : Screen("stats")
 }
 
 @Composable
@@ -26,6 +27,9 @@ fun NavGraph(
             HomeScreen(
                 onNavigateToCreate = {
                     navController.navigate(Screen.CreateHabit.route)
+                },
+                onNavigateToStats = {
+                    navController.navigate(Screen.Stats.route)
                 }
             )
         }
@@ -35,6 +39,9 @@ fun NavGraph(
                     navController.popBackStack()
                 }
             )
+        }
+        composable(Screen.Stats.route) {
+            StatsScreen()
         }
     }
 }
