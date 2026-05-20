@@ -1,13 +1,19 @@
 package com.fervillalba.habittracker.presentation.home
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.content.Context
+import androidx.glance.appwidget.updateAll
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
 import com.fervillalba.habittracker.domain.usecase.CompleteHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.CreateHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.DeleteHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.GetHabitsUseCase
 import com.fervillalba.habittracker.domain.usecase.GetTodayLogsUseCase
+import com.fervillalba.habittracker.util.UiText
+import com.fervillalba.habittracker.widget.HabitWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,12 +24,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    application: Application,
     private val getHabitsUseCase: GetHabitsUseCase,
     private val completeHabitUseCase: CompleteHabitUseCase,
     private val getTodayLogsUseCase: GetTodayLogsUseCase,
     private val deleteHabitUseCase: DeleteHabitUseCase,
     private val createHabitUseCase: CreateHabitUseCase
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -59,8 +66,11 @@ class HomeViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(completedHabitIds = it.completedHabitIds + habitId)
                 }
+                HabitWidget().updateAll(getApplication())
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { 
+                    it.copy(error = e.message?.let { msg -> UiText.DynamicString(msg) }) 
+                }
             }
         }
     }
@@ -70,9 +80,14 @@ class HomeViewModel @Inject constructor(
             try {
                 recentlyDeletedHabit = habit
                 deleteHabitUseCase(habit)
-                _uiState.update { it.copy(deletedHabitMessage = "Hábito eliminado") }
+                HabitWidget().updateAll(getApplication())
+                _uiState.update { 
+                    it.copy(deletedHabitMessage = UiText.StringResource(R.string.habit_deleted)) 
+                }
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.message) }
+                _uiState.update { 
+                    it.copy(error = e.message?.let { msg -> UiText.DynamicString(msg) }) 
+                }
             }
         }
     }
@@ -81,6 +96,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             recentlyDeletedHabit?.let { habit ->
                 createHabitUseCase(habit)
+                HabitWidget().updateAll(getApplication())
                 recentlyDeletedHabit = null
                 _uiState.update { it.copy(deletedHabitMessage = null) }
             }
@@ -94,5 +110,11 @@ class HomeViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    fun updateWidget(context: Context) {
+        viewModelScope.launch {
+            HabitWidget().updateAll(context)
+        }
     }
 }

@@ -7,18 +7,40 @@
     <string name="no_habits_yet">No tienes hábitos todavía</string>
     <string name="click_to_create_first">Pulsa + para crear tu primer hábito</string>
     <string name="complete_habit_content_desc">Completar hábito</string>
+    <string name="delete_content_desc">Eliminar</string>
+    <string name="undo">Deshacer</string>
+    <string name="habit_deleted">Hábito eliminado</string>
+    <string name="today_progress">Progreso de hoy</string>
+    <string name="habits_completed_format">%1$d de %2$d completados</string>
+    <string name="stats_content_desc">Estadísticas</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">Buenos días ☀️</string>
+    <string name="greeting_afternoon">Buenas tardes 🌤</string>
+    <string name="greeting_evening">Buenas tardes 🌆</string>
+    <string name="greeting_night">Buenas noches 🌙</string>
 
     <!-- Create Habit Screen -->
     <string name="new_habit_title">Nuevo hábito</string>
     <string name="back_content_desc">Volver</string>
-    <string name="habit_name_label">Nombre del hábito</string>
+    <string name="habit_name_label">Nombre</string>
     <string name="habit_name_placeholder">Ej: Correr 20 minutos</string>
-    <string name="emoji_label">Emoji</string>
+    <string name="habit_icon_label">Icono</string>
     <string name="frequency_label">Frecuencia</string>
     <string name="frequency_daily">Diario</string>
     <string name="frequency_weekdays">Laboral</string>
     <string name="frequency_weekends">Fin de semana</string>
     <string name="create_habit_button">Crear hábito</string>
+    <string name="create_habit_button_loading">Creando…</string>
+
+    <!-- Stats Screen -->
+    <string name="no_stats_yet">Aún no hay estadísticas</string>
+    <string name="complete_habits_to_see_stats">Completa hábitos para ver tus rachas</string>
+    <string name="times_completed_format">%1$d veces completado</string>
+    <string name="current_streak">Racha actual</string>
+    <string name="best_streak">Mejor racha</string>
+    <string name="last_30_days_label">Últimos 30 días</string>
+    <string name="last_30_days_short">30 días</string>
 
     <!-- Errors -->
     <string name="error_empty_name">El nombre no puede estar vacío</string>

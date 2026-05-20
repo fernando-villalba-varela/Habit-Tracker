@@ -1,5 +1,6 @@
 package com.fervillalba.habittracker.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -54,26 +55,45 @@ class HabitWidget : GlanceAppWidget() {
     }
 }
 
+@SuppressLint("RestrictedApi")
 @Composable
 private fun WidgetContent(
     habits: List<Habit>,
     completedIds: Set<Long>
 ) {
+    val completedCount = habits.count { it.id in completedIds }
+    val total = habits.size
+
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(Color(0xFF0A0A0E))
-            .padding(12.dp)
+            .background(Color(0xF2111116))
+            .padding(16.dp)
     ) {
-        Text(
-            text = "Mis hábitos",
-            style = TextStyle(
-                color = androidx.glance.unit.ColorProvider(Color(0xFF7F77DD)),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            ),
-            modifier = GlanceModifier.padding(bottom = 8.dp)
-        )
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Mis hábitos",
+                style = TextStyle(
+                    color = androidx.glance.unit.ColorProvider(Color(0xFF7F77DD)),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            androidx.glance.layout.Spacer(modifier = GlanceModifier.defaultWeight())
+            Text(
+                text = "$completedCount/$total",
+                style = TextStyle(
+                    color = androidx.glance.unit.ColorProvider(Color(0xFF534AB7)),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            )
+        }
+
+        androidx.glance.layout.Spacer(modifier = GlanceModifier.padding(top = 8.dp))
 
         if (habits.isEmpty()) {
             Box(
@@ -81,7 +101,7 @@ private fun WidgetContent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No hay hábitos",
+                    text = "Añade hábitos en la app",
                     style = TextStyle(
                         color = androidx.glance.unit.ColorProvider(Color(0xFF555566)),
                         fontSize = 12.sp
@@ -94,20 +114,37 @@ private fun WidgetContent(
                 Row(
                     modifier = GlanceModifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = 3.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (isCompleted) "✅" else "⬜",
+                        text = habit.iconEmoji,
+                        style = TextStyle(fontSize = 14.sp),
                         modifier = GlanceModifier.padding(end = 8.dp)
                     )
                     Text(
                         text = habit.name,
                         style = TextStyle(
                             color = androidx.glance.unit.ColorProvider(
-                                if (isCompleted) Color(0xFF7F77DD) else Color(0xFFB0AECE)
+                                if (isCompleted) Color(0xFF534AB7) else Color(0xFFB0AECE)
                             ),
-                            fontSize = 13.sp
+                            fontSize = 13.sp,
+                            fontWeight = if (isCompleted) FontWeight.Normal else FontWeight.Medium,
+                            textDecoration = if (isCompleted)
+                                androidx.glance.text.TextDecoration.LineThrough
+                            else
+                                androidx.glance.text.TextDecoration.None
+                        ),
+                        modifier = GlanceModifier.defaultWeight()
+                    )
+                    Text(
+                        text = if (isCompleted) "✓" else "·",
+                        style = TextStyle(
+                            color = androidx.glance.unit.ColorProvider(
+                                if (isCompleted) Color(0xFF7F77DD) else Color(0xFF2A2A38)
+                            ),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     )
                 }

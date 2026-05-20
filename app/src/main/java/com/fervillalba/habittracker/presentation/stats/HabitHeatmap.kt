@@ -23,27 +23,32 @@ fun HabitHeatmap(
     Canvas(
         modifier = modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(28.dp)
     ) {
         val columns = 30
-        val cellSize = size.width / (columns + 1)
-        val gap = cellSize * 0.15f
-        val cornerRadius = cellSize * 0.2f
+        val totalGap = size.width * 0.04f
+        val cellSize = (size.width - totalGap) / columns
+        val gap = totalGap / (columns - 1)
+        val cornerRadius = cellSize * 0.25f
 
         for (i in 0 until columns) {
             val dayMillis = normalizeToDay(
                 System.currentTimeMillis() - (columns - 1 - i).toLong() * 24 * 60 * 60 * 1000
             )
             val isCompleted = dayMillis in completedDays
-            val color = if (isCompleted) Color(0xFF7F77DD) else Color(0xFF2A2A38)
+            val alpha = if (isCompleted) 1f else 0.15f
+            val color = if (isCompleted)
+                Color(0xFF7F77DD)
+            else
+                Color(0xFF7F77DD).copy(alpha = alpha)
 
             drawRoundRect(
                 color = color,
                 topLeft = Offset(
                     x = i * (cellSize + gap),
-                    y = size.height / 2 - cellSize / 2
+                    y = 0f
                 ),
-                size = Size(cellSize, cellSize),
+                size = Size(cellSize, size.height),
                 cornerRadius = CornerRadius(cornerRadius, cornerRadius)
             )
         }

@@ -1,6 +1,8 @@
 package com.fervillalba.habittracker.presentation.home
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,16 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -28,9 +31,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.fervillalba.habittracker.Constants
+import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
+import com.fervillalba.habittracker.ui.theme.Border
+import com.fervillalba.habittracker.ui.theme.Purple
+import com.fervillalba.habittracker.ui.theme.PurpleDark
+import com.fervillalba.habittracker.ui.theme.Surface as AppSurface
+import com.fervillalba.habittracker.ui.theme.TextSecondary
+import com.fervillalba.habittracker.ui.theme.TextTertiary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,13 +66,19 @@ fun HabitItem(
         }
     }
 
+    val checkScale by animateFloatAsState(
+        targetValue = if (isCompleted) 1.2f else 1f,
+        animationSpec = tween(200),
+        label = "check_scale"
+    )
+
     SwipeToDismissBox(
         state = dismissState,
         enableDismissFromStartToEnd = false,
         backgroundContent = {
             val color by animateColorAsState(
                 targetValue = when (dismissState.targetValue) {
-                    SwipeToDismissBoxValue.EndToStart -> Color.Red.copy(alpha = 0.8f)
+                    SwipeToDismissBoxValue.EndToStart -> Color(0xFFFF4444)
                     else -> Color.Transparent
                 },
                 label = "swipe_color"
@@ -63,67 +86,107 @@ fun HabitItem(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color, shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
-                    .padding(end = 16.dp),
+                    .clip(RoundedCornerShape(Constants.Dimens.RadiusLarge))
+                    .background(color)
+                    .padding(end = Constants.Dimens.PaddingLarge),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Eliminar",
-                    tint = Color.White
+                    contentDescription = stringResource(R.string.delete_content_desc),
+                    tint = Color.White,
+                    modifier = Modifier.size(Constants.Dimens.IconSizeSmall)
                 )
             }
         }
     ) {
-        Card(
+        Surface(
             modifier = modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isCompleted)
-                    MaterialTheme.colorScheme.primaryContainer
-                else
-                    MaterialTheme.colorScheme.surface
-            )
+            shape = RoundedCornerShape(Constants.Dimens.RadiusLarge),
+            color = if (isCompleted) PurpleDark else AppSurface,
+            tonalElevation = 0.dp
         ) {
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .then(
+                        if (isCompleted) Modifier else Modifier.background(
+                            color = Border.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(Constants.Dimens.RadiusLarge)
+                        )
+                    )
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = Constants.Dimens.PaddingLarge,
+                            vertical = Constants.Dimens.SpacingHeader
+                        ),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = habit.iconEmoji,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Text(
-                        text = habit.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = if (isCompleted)
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        else
-                            MaterialTheme.colorScheme.onSurface
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingHeader),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(Constants.Dimens.BoxSizeEmojiItem)
+                                .clip(RoundedCornerShape(Constants.Dimens.RadiusSmall))
+                                .background(
+                                    if (isCompleted)
+                                        Purple.copy(alpha = 0.3f)
+                                    else
+                                        Color.White.copy(alpha = 0.05f)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = habit.iconEmoji,
+                                fontSize = 22.sp
+                            )
+                        }
+                        Text(
+                            text = habit.name,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = if (isCompleted) FontWeight.Normal else FontWeight.Medium,
+                                textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                            ),
+                            color = if (isCompleted) TextSecondary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onComplete,
+                        enabled = !isCompleted,
+                        modifier = Modifier.scale(checkScale)
+                    ) {
+                        Icon(
+                            imageVector = if (isCompleted)
+                                Icons.Filled.CheckCircle
+                            else
+                                Icons.Outlined.CheckCircle,
+                            contentDescription = stringResource(R.string.complete_habit_content_desc),
+                            modifier = Modifier.size(Constants.Dimens.IconSizeCheck),
+                            tint = if (isCompleted) Purple else TextTertiary
+                        )
+                    }
                 }
-                IconButton(
-                    onClick = onComplete,
-                    enabled = !isCompleted
-                ) {
-                    Icon(
-                        imageVector = if (isCompleted)
-                            Icons.Filled.CheckCircle
-                        else
-                            Icons.Outlined.CheckCircle,
-                        contentDescription = "Completar hábito",
-                        modifier = Modifier.size(32.dp),
-                        tint = if (isCompleted)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+
+                if (isCompleted) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(start = Constants.Dimens.SpacingMedium, top = 0.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(Constants.Dimens.DotSize)
+                                .clip(CircleShape)
+                                .background(Purple)
+                        )
+                    }
                 }
             }
         }

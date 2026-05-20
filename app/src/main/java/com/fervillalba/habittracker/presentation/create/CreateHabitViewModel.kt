@@ -2,6 +2,7 @@ package com.fervillalba.habittracker.presentation.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
 import com.fervillalba.habittracker.domain.model.HabitFrequency

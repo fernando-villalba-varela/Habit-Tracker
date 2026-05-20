@@ -45,7 +45,7 @@ class HabitRepositoryImpl(
 
     override suspend fun getLogsForDate(dateMillis: Long): List<HabitLog> {
         val startOfDay = getStartOfDay(dateMillis)
-        val endOfDay = startOfDay + 24 * 60 * 60 * 1000
+        val endOfDay = startOfDay + com.fervillalba.habittracker.Constants.MILLIS_IN_DAY
         return dao.getLogsForDate(startOfDay, endOfDay).map { it.toDomain() }
     }
 
