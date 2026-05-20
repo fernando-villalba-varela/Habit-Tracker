@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,7 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.R
-import com.fervillalba.habittracker.presentation.Screen.EditHabit.createRoute
+import com.fervillalba.habittracker.domain.model.HabitFrequency
 import com.fervillalba.habittracker.ui.theme.Background
 import com.fervillalba.habittracker.ui.theme.Purple
 import com.fervillalba.habittracker.ui.theme.PurpleDark
@@ -70,8 +72,10 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val filteredHabits by viewModel.filteredHabits.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val undoLabel = stringResource(R.string.undo)
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -79,8 +83,6 @@ fun HomeScreen(
             viewModel.clearError()
         }
     }
-
-    val undoLabel = stringResource(R.string.undo)
 
     LaunchedEffect(uiState.deletedHabitMessage) {
         uiState.deletedHabitMessage?.let {
@@ -165,9 +167,9 @@ fun HomeScreen(
             }
 
             // Progress card
-            if (uiState.habits.isNotEmpty()) {
-                val completed = uiState.completedHabitIds.size
-                val total = uiState.habits.size
+            if (filteredHabits.isNotEmpty()) {
+                val completed = filteredHabits.count { it.id in uiState.completedHabitIds }
+                val total = filteredHabits.size
                 val progress = if (total > 0) completed.toFloat() / total else 0f
 
                 Box(
@@ -240,6 +242,46 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(Constants.Dimens.SpacingLarge))
             }
 
+            // Filtros de frecuencia
+            if (uiState.habits.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = Constants.Dimens.PaddingLarge),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        selected = uiState.selectedFilter == null,
+                        onClick = { viewModel.onFilterChange(null) },
+                        label = { Text("Todos") },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Purple,
+                            selectedLabelColor = Color.White
+                        )
+                    )
+                    HabitFrequency.entries.forEach { frequency ->
+                        FilterChip(
+                            selected = uiState.selectedFilter == frequency,
+                            onClick = { viewModel.onFilterChange(frequency) },
+                            label = {
+                                Text(
+                                    when (frequency) {
+                                        HabitFrequency.DAILY -> "Diario"
+                                        HabitFrequency.WEEKDAYS -> "Laboral"
+                                        HabitFrequency.WEEKENDS -> "Fin de semana"
+                                    }
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Purple,
+                                selectedLabelColor = Color.White
+                            )
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             // Lista o empty state
             when {
                 uiState.habits.isEmpty() -> {
@@ -272,9 +314,29 @@ fun HomeScreen(
                         }
                     }
                 }
+                filteredHabits.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("🔍", fontSize = 48.sp)
+                            Text(
+                                text = "No hay hábitos con este filtro",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextSecondary
+                            )
+                        }
+                    }
+                }
                 else -> {
                     // Mensaje celebración
-                    if (uiState.completedHabitIds.size == uiState.habits.size) {
+                    if (filteredHabits.isNotEmpty() &&
+                        filteredHabits.all { it.id in uiState.completedHabitIds }
+                    ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -316,7 +378,7 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingItems)
                     ) {
                         items(
-                            items = uiState.habits,
+                            items = filteredHabits,
                             key = { it.id }
                         ) { habit ->
                             HabitItem(

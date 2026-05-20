@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
+import com.fervillalba.habittracker.domain.model.HabitFrequency
 import com.fervillalba.habittracker.domain.usecase.CompleteHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.CreateHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.DeleteHabitUseCase
@@ -15,8 +16,11 @@ import com.fervillalba.habittracker.util.UiText
 import com.fervillalba.habittracker.widget.HabitWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -109,6 +113,21 @@ class HomeViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    val filteredHabits: StateFlow<List<Habit>> = uiState
+        .map { state ->
+            if (state.selectedFilter == null) state.habits
+            else state.habits.filter { it.frequency == state.selectedFilter }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun onFilterChange(filter: HabitFrequency?) {
+        _uiState.update { it.copy(selectedFilter = filter) }
     }
 
     private fun updateWidget() {
