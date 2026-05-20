@@ -1,18 +1,16 @@
 package com.fervillalba.habittracker.presentation.edit
 
 import android.app.Application
-import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.fervillalba.habittracker.R
-import com.fervillalba.habittracker.domain.model.Habit
+import com.fervillalba.habittracker.di.WorkManagerHelper
 import com.fervillalba.habittracker.domain.model.HabitFrequency
 import com.fervillalba.habittracker.domain.usecase.EditHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.GetHabitsUseCase
 import com.fervillalba.habittracker.util.UiText
-import com.fervillalba.habittracker.widget.HabitWidget
-import dagger.hilt.android.internal.Contexts.getApplication
+import com.fervillalba.habittracker.widget.WidgetUpdateWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,6 +47,7 @@ class EditHabitViewModel @Inject constructor(
                     name = habit.name,
                     iconEmoji = habit.iconEmoji,
                     frequency = habit.frequency,
+                    reminderTime = habit.reminderTime,
                     isLoading = false
                 )
             }
@@ -67,6 +66,14 @@ class EditHabitViewModel @Inject constructor(
         _uiState.update { it.copy(frequency = frequency) }
     }
 
+    fun onReminderTimeChange(time: String?) {
+        _uiState.update { it.copy(reminderTime = time) }
+    }
+
+    fun onShowTimePicker(show: Boolean) {
+        _uiState.update { it.copy(showTimePicker = show) }
+    }
+
     fun saveHabit(onSuccess: () -> Unit) {
         val state = _uiState.value
 
@@ -82,16 +89,31 @@ class EditHabitViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = true) }
                 val habits = getHabitsUseCase().first()
                 val original = habits.find { it.id == habitId } ?: return@launch
+
                 editHabitUseCase(
                     original.copy(
                         name = state.name.trim(),
                         iconEmoji = state.iconEmoji,
-                        frequency = state.frequency
+                        frequency = state.frequency,
+                        reminderTime = state.reminderTime
                     )
                 )
-                viewModelScope.launch {
-                    HabitWidget().updateAll(getApplication())
+
+                if (state.reminderTime != null) {
+                    WorkManagerHelper.scheduleHabitReminderAtTime(
+                        context = getApplication(),
+                        habitId = habitId,
+                        habitName = state.name,
+                        reminderTime = state.reminderTime
+                    )
+                } else {
+                    WorkManagerHelper.cancelHabitReminder(
+                        context = getApplication(),
+                        habitId = habitId
+                    )
                 }
+
+                updateWidget()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.update {
@@ -102,5 +124,10 @@ class EditHabitViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun updateWidget() {
+        val context = getApplication<Application>().applicationContext
+        WidgetUpdateWorker.enqueue(context)
     }
 }

@@ -10,5 +10,7 @@ data class CreateHabitUiState(
     val frequency: HabitFrequency = HabitFrequency.DAILY,
     val isLoading: Boolean = false,
     val nameError: UiText? = null,
-    val error: UiText? = null
+    val error: UiText? = null,
+    val reminderTime: String? = null,
+    val showTimePicker: Boolean = false
 )

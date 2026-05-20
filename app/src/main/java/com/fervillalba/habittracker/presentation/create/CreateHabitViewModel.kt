@@ -1,10 +1,10 @@
 package com.fervillalba.habittracker.presentation.create
 
 import android.app.Application
-import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.fervillalba.habittracker.R
+import com.fervillalba.habittracker.di.WorkManagerHelper
 import com.fervillalba.habittracker.domain.model.Habit
 import com.fervillalba.habittracker.domain.model.HabitFrequency
 import com.fervillalba.habittracker.domain.usecase.CreateHabitUseCase
@@ -39,12 +39,20 @@ class CreateHabitViewModel @Inject constructor(
         _uiState.update { it.copy(frequency = frequency) }
     }
 
+    fun onReminderTimeChange(time: String?) {
+        _uiState.update { it.copy(reminderTime = time) }
+    }
+
+    fun onShowTimePicker(show: Boolean) {
+        _uiState.update { it.copy(showTimePicker = show) }
+    }
+
     fun createHabit(onSuccess: () -> Unit) {
         val state = _uiState.value
 
         if (state.name.isBlank()) {
-            _uiState.update { 
-                it.copy(nameError = UiText.StringResource(R.string.error_empty_name)) 
+            _uiState.update {
+                it.copy(nameError = UiText.StringResource(R.string.error_empty_name))
             }
             return
         }
@@ -52,21 +60,31 @@ class CreateHabitViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
-                createHabitUseCase(
-                    Habit(
-                        name = state.name.trim(),
-                        iconEmoji = state.iconEmoji,
-                        frequency = state.frequency
-                    )
+                val habit = Habit(
+                    name = state.name.trim(),
+                    iconEmoji = state.iconEmoji,
+                    frequency = state.frequency,
+                    reminderTime = state.reminderTime
                 )
+                createHabitUseCase(habit)
+
+                state.reminderTime?.let { time ->
+                    WorkManagerHelper.scheduleHabitReminderAtTime(
+                        context = getApplication(),
+                        habitId = System.currentTimeMillis(),
+                        habitName = state.name,
+                        reminderTime = time
+                    )
+                }
+
                 updateWidget()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.update { 
+                _uiState.update {
                     it.copy(
-                        error = e.message?.let { msg -> UiText.DynamicString(msg) }, 
+                        error = e.message?.let { msg -> UiText.DynamicString(msg) },
                         isLoading = false
-                    ) 
+                    )
                 }
             }
         }

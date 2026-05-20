@@ -12,5 +12,7 @@ data class EditHabitUiState(
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
     val nameError: UiText? = null,
-    val error: UiText? = null
+    val error: UiText? = null,
+    val reminderTime: String? = null,
+    val showTimePicker: Boolean = false
 )

@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.HabitFrequency
+import com.fervillalba.habittracker.presentation.components.ReminderTimeSelector
 import com.fervillalba.habittracker.ui.theme.Background
 import com.fervillalba.habittracker.ui.theme.Border
 import com.fervillalba.habittracker.ui.theme.Purple
@@ -210,7 +211,13 @@ fun CreateHabitScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Botón
+            ReminderTimeSelector(
+                reminderTime = uiState.reminderTime,
+                showTimePicker = uiState.showTimePicker,
+                onShowTimePicker = viewModel::onShowTimePicker,
+                onTimeSelected = viewModel::onReminderTimeChange
+            )
+
             Button(
                 onClick = { viewModel.createHabit(onNavigateBack) },
                 modifier = Modifier
