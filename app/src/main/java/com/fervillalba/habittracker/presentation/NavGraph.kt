@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.presentation.create.CreateHabitScreen
+import com.fervillalba.habittracker.presentation.detail.HabitDetailScreen
 import com.fervillalba.habittracker.presentation.edit.EditHabitScreen
 import com.fervillalba.habittracker.presentation.home.HomeScreen
 import com.fervillalba.habittracker.presentation.stats.StatsScreen
@@ -18,6 +19,10 @@ sealed class Screen(val route: String) {
 
     data object EditHabit : Screen("edit_habit/{habitId}") {
         fun createRoute(habitId: Long) = "edit_habit/$habitId"
+    }
+
+    data object HabitDetail : Screen("habit_detail/{habitId}") {
+        fun createRoute(habitId: Long) = "habit_detail/$habitId"
     }
 }
 
@@ -39,6 +44,13 @@ fun NavGraph(
                             habitId
                         )
                     )
+                },
+                onNavigateToDetail = { habitId ->
+                    navController.navigate(
+                        Screen.HabitDetail.createRoute(
+                            habitId
+                        )
+                    )
                 }
             )
         }
@@ -57,6 +69,12 @@ fun NavGraph(
 
         composable(Screen.EditHabit.route) {
             EditHabitScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.HabitDetail.route) {
+            HabitDetailScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

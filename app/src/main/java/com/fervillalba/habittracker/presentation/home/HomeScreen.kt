@@ -69,6 +69,7 @@ fun HomeScreen(
     onNavigateToCreate: () -> Unit,
     onNavigateToStats: () -> Unit,
     onNavigateToEdit: (Long) -> Unit,
+    onNavigateToDetail: (Long) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -386,7 +387,8 @@ fun HomeScreen(
                                 isCompleted = habit.id in uiState.completedHabitIds,
                                 onComplete = { viewModel.completeHabit(habit.id) },
                                 onDelete = { viewModel.deleteHabit(habit) },
-                                onEdit = { onNavigateToEdit(habit.id) }
+                                onEdit = { onNavigateToEdit(habit.id) },
+                                onDetail = { onNavigateToDetail(habit.id) }
                             )
                         }
                     }

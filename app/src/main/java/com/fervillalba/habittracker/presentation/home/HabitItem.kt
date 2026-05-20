@@ -55,6 +55,7 @@ fun HabitItem(
     onComplete: () -> Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
+    onDetail: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dismissState = rememberSwipeToDismissBoxState()
