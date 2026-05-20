@@ -67,8 +67,8 @@ fun HabitItem(
     }
 
     val checkScale by animateFloatAsState(
-        targetValue = if (isCompleted) 1.2f else 1f,
-        animationSpec = tween(200),
+        targetValue = if (isCompleted) 1.1f else 1f,
+        animationSpec = tween(300),
         label = "check_scale"
     )
 
@@ -78,7 +78,7 @@ fun HabitItem(
         backgroundContent = {
             val color by animateColorAsState(
                 targetValue = when (dismissState.targetValue) {
-                    SwipeToDismissBoxValue.EndToStart -> Color(0xFFFF4444)
+                    SwipeToDismissBoxValue.EndToStart -> Color(0xFFFF4D4D)
                     else -> Color.Transparent
                 },
                 label = "swipe_color"
@@ -103,90 +103,69 @@ fun HabitItem(
         Surface(
             modifier = modifier.fillMaxWidth(),
             shape = RoundedCornerShape(Constants.Dimens.RadiusLarge),
-            color = if (isCompleted) PurpleDark else AppSurface,
-            tonalElevation = 0.dp
+            color = if (isCompleted) Color(0xFF1E1C3D) else AppSurface,
+            tonalElevation = if (isCompleted) 0.dp else 2.dp,
+            shadowElevation = if (isCompleted) 0.dp else 4.dp
         ) {
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .then(
-                        if (isCompleted) Modifier else Modifier.background(
-                            color = Border.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(Constants.Dimens.RadiusLarge)
-                        )
-                    )
+                    .padding(
+                        horizontal = Constants.Dimens.PaddingLarge,
+                        vertical = Constants.Dimens.SpacingHeader
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = Constants.Dimens.PaddingLarge,
-                            vertical = Constants.Dimens.SpacingHeader
-                        ),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingHeader),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingHeader),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(Constants.Dimens.BoxSizeEmojiItem)
-                                .clip(RoundedCornerShape(Constants.Dimens.RadiusSmall))
-                                .background(
-                                    if (isCompleted)
-                                        Purple.copy(alpha = 0.3f)
-                                    else
-                                        Color.White.copy(alpha = 0.05f)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = habit.iconEmoji,
-                                fontSize = 22.sp
-                            )
-                        }
-                        Text(
-                            text = habit.name,
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = if (isCompleted) FontWeight.Normal else FontWeight.Medium,
-                                textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
-                            ),
-                            color = if (isCompleted) TextSecondary else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
-                    IconButton(
-                        onClick = onComplete,
-                        enabled = !isCompleted,
-                        modifier = Modifier.scale(checkScale)
-                    ) {
-                        Icon(
-                            imageVector = if (isCompleted)
-                                Icons.Filled.CheckCircle
-                            else
-                                Icons.Outlined.CheckCircle,
-                            contentDescription = stringResource(R.string.complete_habit_content_desc),
-                            modifier = Modifier.size(Constants.Dimens.IconSizeCheck),
-                            tint = if (isCompleted) Purple else TextTertiary
-                        )
-                    }
-                }
-
-                if (isCompleted) {
                     Box(
                         modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(start = Constants.Dimens.SpacingMedium, top = 0.dp)
+                            .size(Constants.Dimens.BoxSizeEmojiItem)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (isCompleted)
+                                    Purple.copy(alpha = 0.15f)
+                                else
+                                    Color.White.copy(alpha = 0.05f)
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(Constants.Dimens.DotSize)
-                                .clip(CircleShape)
-                                .background(Purple)
+                        Text(
+                            text = habit.iconEmoji,
+                            fontSize = 24.sp,
+                            modifier = Modifier.scale(if (isCompleted) 0.9f else 1f)
                         )
                     }
+                    Text(
+                        text = habit.name,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = if (isCompleted) FontWeight.Normal else FontWeight.SemiBold,
+                            textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                        ),
+                        color = if (isCompleted) Color(0xFF8E8E9F) else MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                }
+
+                IconButton(
+                    onClick = onComplete,
+                    enabled = !isCompleted,
+                    modifier = Modifier.scale(checkScale)
+                ) {
+                    Icon(
+                        imageVector = if (isCompleted)
+                            Icons.Filled.CheckCircle
+                        else
+                            Icons.Outlined.CheckCircle,
+                        contentDescription = stringResource(R.string.complete_habit_content_desc),
+                        modifier = Modifier.size(Constants.Dimens.IconSizeCheck),
+                        tint = if (isCompleted) Purple else Purple.copy(alpha = 0.6f)
+                    )
                 }
             }
         }

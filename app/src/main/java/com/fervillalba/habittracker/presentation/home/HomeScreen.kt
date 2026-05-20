@@ -37,6 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -95,12 +98,14 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = onNavigateToCreate,
                 containerColor = Purple,
-                contentColor = Background,
-                shape = CircleShape
+                contentColor = Color.White,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.shadow(8.dp, RoundedCornerShape(16.dp))
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_habit_content_desc)
+                    contentDescription = stringResource(R.string.add_habit_content_desc),
+                    modifier = Modifier.size(28.dp)
                 )
             }
         },
@@ -130,25 +135,31 @@ fun HomeScreen(
                     )
                     Text(
                         text = stringResource(R.string.home_title),
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = getTodayDate(),
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextTertiary
+                        color = TextTertiary,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
-                IconButton(onClick = onNavigateToStats) {
+                IconButton(
+                    onClick = onNavigateToStats,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(Surface)
+                ) {
                     Icon(
                         imageVector = Icons.Default.BarChart,
                         contentDescription = stringResource(R.string.stats_content_desc),
-                        tint = TextSecondary
+                        tint = Purple
                     )
                 }
             }
 
-            // Progress card
+            // Progress card (Modern Dashboard Style)
             if (uiState.habits.isNotEmpty()) {
                 val completed = uiState.completedHabitIds.size
                 val total = uiState.habits.size
@@ -159,7 +170,11 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .padding(horizontal = Constants.Dimens.PaddingLarge)
                         .clip(RoundedCornerShape(Constants.Dimens.RadiusLarge))
-                        .background(Surface)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Surface, Surface.copy(alpha = 0.8f))
+                            )
+                        )
                         .padding(Constants.Dimens.PaddingLarge)
                 ) {
                     Column(
@@ -173,8 +188,9 @@ fun HomeScreen(
                             Column {
                                 Text(
                                     text = stringResource(R.string.today_progress),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = TextTertiary
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = Purple,
+                                    fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
                                     text = stringResource(
@@ -182,21 +198,21 @@ fun HomeScreen(
                                         completed,
                                         total
                                     ),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                             Box(
                                 modifier = Modifier
-                                    .size(Constants.Dimens.BoxSizeCheck)
+                                    .size(60.dp)
                                     .clip(CircleShape)
                                     .background(PurpleDark),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = "${(progress * 100).toInt()}%",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.ExtraBold,
                                     color = Purple
                                 )
                             }
@@ -206,10 +222,12 @@ fun HomeScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(Constants.Dimens.ProgressHeight)
-                                .clip(RoundedCornerShape(Constants.Dimens.RadiusIndicator)),
+                                .clip(CircleShape),
                             color = Purple,
                             trackColor = PurpleDark,
-                            strokeCap = StrokeCap.Round
+                            strokeCap = StrokeCap.Butt,
+                            gapSize = 0.dp,
+                            drawStopIndicator = {}
                         )
                     }
                 }
@@ -226,18 +244,25 @@ fun HomeScreen(
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)
+                            verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingMedium)
                         ) {
-                            Text("🎯", fontSize = 48.sp)
+                            Text(
+                                "🎯", 
+                                fontSize = 64.sp,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
                             Text(
                                 text = stringResource(R.string.no_habits_yet),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = TextSecondary
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Text(
                                 text = stringResource(R.string.click_to_create_first),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = TextTertiary
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = TextTertiary,
+                                modifier = Modifier.padding(horizontal = 48.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         }
                     }
@@ -248,7 +273,7 @@ fun HomeScreen(
                         contentPadding = PaddingValues(
                             start = Constants.Dimens.PaddingLarge,
                             end = Constants.Dimens.PaddingLarge,
-                            bottom = 80.dp
+                            bottom = 100.dp
                         ),
                         verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingItems)
                     ) {

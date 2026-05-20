@@ -1,13 +1,15 @@
 package com.fervillalba.habittracker.presentation.create
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.glance.appwidget.updateAll
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
 import com.fervillalba.habittracker.domain.model.HabitFrequency
 import com.fervillalba.habittracker.domain.usecase.CreateHabitUseCase
 import com.fervillalba.habittracker.util.UiText
+import com.fervillalba.habittracker.widget.HabitWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateHabitViewModel @Inject constructor(
+    application: Application,
     private val createHabitUseCase: CreateHabitUseCase
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(CreateHabitUiState())
     val uiState: StateFlow<CreateHabitUiState> = _uiState.asStateFlow()
@@ -56,6 +59,7 @@ class CreateHabitViewModel @Inject constructor(
                         frequency = state.frequency
                     )
                 )
+                updateWidget()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.update { 
@@ -70,5 +74,10 @@ class CreateHabitViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    private fun updateWidget() {
+        val context = getApplication<Application>().applicationContext
+        com.fervillalba.habittracker.widget.WidgetUpdateWorker.enqueue(context)
     }
 }

@@ -27,7 +27,9 @@ object AppModule {
             context,
             HabitDatabase::class.java,
             Constants.DATABASE_NAME
-        ).build()
+        )
+            .enableMultiInstanceInvalidation()
+            .build()
     }
 
     @Provides

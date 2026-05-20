@@ -1,7 +1,6 @@
 package com.fervillalba.habittracker.presentation.home
 
 import android.app.Application
-import android.content.Context
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -66,7 +65,7 @@ class HomeViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(completedHabitIds = it.completedHabitIds + habitId)
                 }
-                HabitWidget().updateAll(getApplication())
+                updateWidget()
             } catch (e: Exception) {
                 _uiState.update { 
                     it.copy(error = e.message?.let { msg -> UiText.DynamicString(msg) }) 
@@ -80,7 +79,7 @@ class HomeViewModel @Inject constructor(
             try {
                 recentlyDeletedHabit = habit
                 deleteHabitUseCase(habit)
-                HabitWidget().updateAll(getApplication())
+                updateWidget()
                 _uiState.update { 
                     it.copy(deletedHabitMessage = UiText.StringResource(R.string.habit_deleted)) 
                 }
@@ -96,9 +95,9 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             recentlyDeletedHabit?.let { habit ->
                 createHabitUseCase(habit)
-                HabitWidget().updateAll(getApplication())
                 recentlyDeletedHabit = null
                 _uiState.update { it.copy(deletedHabitMessage = null) }
+                updateWidget()
             }
         }
     }
@@ -112,9 +111,8 @@ class HomeViewModel @Inject constructor(
         _uiState.update { it.copy(error = null) }
     }
 
-    fun updateWidget(context: Context) {
-        viewModelScope.launch {
-            HabitWidget().updateAll(context)
-        }
+    private fun updateWidget() {
+        val context = getApplication<Application>().applicationContext
+        com.fervillalba.habittracker.widget.WidgetUpdateWorker.enqueue(context)
     }
 }

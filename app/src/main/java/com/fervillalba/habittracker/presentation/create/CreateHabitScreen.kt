@@ -1,7 +1,6 @@
 package com.fervillalba.habittracker.presentation.create
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,8 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -51,7 +52,6 @@ import com.fervillalba.habittracker.ui.theme.Purple
 import com.fervillalba.habittracker.ui.theme.PurpleDark
 import com.fervillalba.habittracker.ui.theme.PurpleDim
 import com.fervillalba.habittracker.ui.theme.Surface
-import com.fervillalba.habittracker.ui.theme.TextSecondary
 import com.fervillalba.habittracker.ui.theme.TextTertiary
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -69,7 +69,8 @@ fun CreateHabitScreen(
                 title = {
                     Text(
                         stringResource(R.string.new_habit_title),
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
@@ -77,7 +78,7 @@ fun CreateHabitScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back_content_desc),
-                            tint = TextSecondary
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
@@ -100,8 +101,8 @@ fun CreateHabitScreen(
                 Text(
                     text = stringResource(R.string.habit_name_label),
                     style = MaterialTheme.typography.labelLarge,
-                    color = TextSecondary,
-                    fontWeight = FontWeight.Medium
+                    color = Purple,
+                    fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
                     value = uiState.name,
@@ -137,25 +138,25 @@ fun CreateHabitScreen(
                 Text(
                     text = stringResource(R.string.habit_icon_label),
                     style = MaterialTheme.typography.labelLarge,
-                    color = TextSecondary,
-                    fontWeight = FontWeight.Medium
+                    color = Purple,
+                    fontWeight = FontWeight.Bold
                 )
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall),
-                    verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)
+                    verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(Constants.Dimens.RadiusMedium))
+                        .background(Surface)
+                        .padding(Constants.Dimens.PaddingSmall)
                 ) {
                     Constants.EMOJI_OPTIONS.forEach { emoji ->
                         val isSelected = uiState.iconEmoji == emoji
                         Box(
                             modifier = Modifier
                                 .size(Constants.Dimens.BoxSizeEmoji)
-                                .clip(RoundedCornerShape(Constants.Dimens.RadiusMedium))
-                                .background(if (isSelected) PurpleDark else Surface)
-                                .border(
-                                    width = Constants.Dimens.BorderWidth,
-                                    color = if (isSelected) Purple else Border,
-                                    shape = RoundedCornerShape(Constants.Dimens.RadiusMedium)
-                                )
+                                .clip(RoundedCornerShape(Constants.Dimens.RadiusSmall))
+                                .background(if (isSelected) Purple else Color.White.copy(alpha = 0.05f))
                                 .clickable { viewModel.onEmojiChange(emoji) },
                             contentAlignment = Alignment.Center
                         ) {
@@ -170,24 +171,26 @@ fun CreateHabitScreen(
                 Text(
                     text = stringResource(R.string.frequency_label),
                     style = MaterialTheme.typography.labelLarge,
-                    color = TextSecondary,
-                    fontWeight = FontWeight.Medium
+                    color = Purple,
+                    fontWeight = FontWeight.Bold
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(Constants.Dimens.RadiusMedium))
+                        .background(Surface)
+                        .padding(Constants.Dimens.PaddingSmall)
+                ) {
                     HabitFrequency.entries.forEach { frequency ->
                         val isSelected = uiState.frequency == frequency
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .clip(RoundedCornerShape(Constants.Dimens.RadiusSmall))
-                                .background(if (isSelected) PurpleDark else Surface)
-                                .border(
-                                    width = Constants.Dimens.BorderWidth,
-                                    color = if (isSelected) Purple else Border,
-                                    shape = RoundedCornerShape(Constants.Dimens.RadiusSmall)
-                                )
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(if (isSelected) Purple else Color.Transparent)
                                 .clickable { viewModel.onFrequencyChange(frequency) }
-                                .padding(vertical = Constants.Dimens.SpacingMedium),
+                                .padding(vertical = 12.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -197,19 +200,22 @@ fun CreateHabitScreen(
                                     HabitFrequency.WEEKENDS -> stringResource(R.string.frequency_weekends)
                                 },
                                 style = MaterialTheme.typography.bodySmall,
-                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                                color = if (isSelected) Purple else TextSecondary
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isSelected) Color.White else TextTertiary
                             )
                         }
                     }
                 }
             }
 
+            Spacer(modifier = Modifier.weight(1f))
+
             // Botón
             Button(
                 onClick = { viewModel.createHabit(onNavigateBack) },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(56.dp)
                     .padding(vertical = Constants.Dimens.PaddingSmall),
                 enabled = !uiState.isLoading,
                 shape = RoundedCornerShape(Constants.Dimens.RadiusMedium),
@@ -217,7 +223,8 @@ fun CreateHabitScreen(
                     containerColor = Purple,
                     contentColor = Color.White,
                     disabledContainerColor = PurpleDim.copy(alpha = 0.5f)
-                )
+                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
                 Text(
                     text = if (uiState.isLoading) {
@@ -225,8 +232,8 @@ fun CreateHabitScreen(
                     } else {
                         stringResource(R.string.create_habit_button)
                     },
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(vertical = 6.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
