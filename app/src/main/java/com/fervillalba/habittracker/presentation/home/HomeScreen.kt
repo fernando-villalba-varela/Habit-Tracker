@@ -44,12 +44,14 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.R
+import com.fervillalba.habittracker.presentation.Screen.EditHabit.createRoute
 import com.fervillalba.habittracker.ui.theme.Background
 import com.fervillalba.habittracker.ui.theme.Purple
 import com.fervillalba.habittracker.ui.theme.PurpleDark
@@ -64,6 +66,7 @@ import java.util.Locale
 fun HomeScreen(
     onNavigateToCreate: () -> Unit,
     onNavigateToStats: () -> Unit,
+    onNavigateToEdit: (Long) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -77,11 +80,13 @@ fun HomeScreen(
         }
     }
 
+    val undoLabel = stringResource(R.string.undo)
+
     LaunchedEffect(uiState.deletedHabitMessage) {
         uiState.deletedHabitMessage?.let {
             val result = snackbarHostState.showSnackbar(
                 message = it.asString(context),
-                actionLabel = context.getString(R.string.undo),
+                actionLabel = undoLabel,
                 duration = SnackbarDuration.Short
             )
             if (result == SnackbarResult.ActionPerformed) {
@@ -159,7 +164,7 @@ fun HomeScreen(
                 }
             }
 
-            // Progress card (Modern Dashboard Style)
+            // Progress card
             if (uiState.habits.isNotEmpty()) {
                 val completed = uiState.completedHabitIds.size
                 val total = uiState.habits.size
@@ -247,7 +252,7 @@ fun HomeScreen(
                             verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingMedium)
                         ) {
                             Text(
-                                "🎯", 
+                                "🎯",
                                 fontSize = 64.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
@@ -262,12 +267,45 @@ fun HomeScreen(
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = TextTertiary,
                                 modifier = Modifier.padding(horizontal = 48.dp),
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
                 }
                 else -> {
+                    // Mensaje celebración
+                    if (uiState.completedHabitIds.size == uiState.habits.size) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = Constants.Dimens.PaddingLarge)
+                                .clip(RoundedCornerShape(Constants.Dimens.RadiusLarge))
+                                .background(Purple.copy(alpha = 0.15f))
+                                .padding(16.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Text("🎉", fontSize = 28.sp)
+                                Column {
+                                    Text(
+                                        text = "¡Todos completados!",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Purple
+                                    )
+                                    Text(
+                                        text = "Excelente trabajo hoy",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = TextSecondary
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(
@@ -285,7 +323,8 @@ fun HomeScreen(
                                 habit = habit,
                                 isCompleted = habit.id in uiState.completedHabitIds,
                                 onComplete = { viewModel.completeHabit(habit.id) },
-                                onDelete = { viewModel.deleteHabit(habit) }
+                                onDelete = { viewModel.deleteHabit(habit) },
+                                onEdit = { onNavigateToEdit(habit.id) }
                             )
                         }
                     }

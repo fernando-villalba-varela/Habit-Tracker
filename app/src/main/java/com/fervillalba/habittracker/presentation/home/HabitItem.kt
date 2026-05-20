@@ -3,7 +3,9 @@ package com.fervillalba.habittracker.presentation.home
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -42,20 +43,18 @@ import androidx.compose.ui.unit.sp
 import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
-import com.fervillalba.habittracker.ui.theme.Border
 import com.fervillalba.habittracker.ui.theme.Purple
-import com.fervillalba.habittracker.ui.theme.PurpleDark
 import com.fervillalba.habittracker.ui.theme.Surface as AppSurface
 import com.fervillalba.habittracker.ui.theme.TextSecondary
-import com.fervillalba.habittracker.ui.theme.TextTertiary
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HabitItem(
     habit: Habit,
     isCompleted: Boolean,
     onComplete: () -> Unit,
     onDelete: () -> Unit,
+    onEdit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dismissState = rememberSwipeToDismissBoxState()
@@ -101,7 +100,12 @@ fun HabitItem(
         }
     ) {
         Surface(
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = onEdit
+                ),
             shape = RoundedCornerShape(Constants.Dimens.RadiusLarge),
             color = if (isCompleted) Color(0xFF1E1C3D) else AppSurface,
             tonalElevation = if (isCompleted) 0.dp else 2.dp,
