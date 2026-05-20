@@ -1,7 +1,6 @@
 package com.fervillalba.habittracker.presentation.home
 
 import android.app.Application
-import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.fervillalba.habittracker.R
@@ -12,8 +11,8 @@ import com.fervillalba.habittracker.domain.usecase.CreateHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.DeleteHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.GetHabitsUseCase
 import com.fervillalba.habittracker.domain.usecase.GetTodayLogsUseCase
+import com.fervillalba.habittracker.util.Resource
 import com.fervillalba.habittracker.util.UiText
-import com.fervillalba.habittracker.widget.HabitWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -64,33 +63,35 @@ class HomeViewModel @Inject constructor(
 
     fun completeHabit(habitId: Long) {
         viewModelScope.launch {
-            try {
-                completeHabitUseCase(habitId)
-                _uiState.update {
-                    it.copy(completedHabitIds = it.completedHabitIds + habitId)
+            when (val result = completeHabitUseCase(habitId)) {
+                is Resource.Success -> {
+                    _uiState.update {
+                        it.copy(completedHabitIds = it.completedHabitIds + habitId)
+                    }
+                    updateWidget()
                 }
-                updateWidget()
-            } catch (e: Exception) {
-                _uiState.update { 
-                    it.copy(error = e.message?.let { msg -> UiText.DynamicString(msg) }) 
+                is Resource.Error -> {
+                    _uiState.update { it.copy(error = result.message) }
                 }
+                is Resource.Loading -> {}
             }
         }
     }
 
     fun deleteHabit(habit: Habit) {
         viewModelScope.launch {
-            try {
-                recentlyDeletedHabit = habit
-                deleteHabitUseCase(habit)
-                updateWidget()
-                _uiState.update { 
-                    it.copy(deletedHabitMessage = UiText.StringResource(R.string.habit_deleted)) 
+            recentlyDeletedHabit = habit
+            when (val result = deleteHabitUseCase(habit)) {
+                is Resource.Success -> {
+                    updateWidget()
+                    _uiState.update {
+                        it.copy(deletedHabitMessage = UiText.StringResource(R.string.habit_deleted))
+                    }
                 }
-            } catch (e: Exception) {
-                _uiState.update { 
-                    it.copy(error = e.message?.let { msg -> UiText.DynamicString(msg) }) 
+                is Resource.Error -> {
+                    _uiState.update { it.copy(error = result.message) }
                 }
+                is Resource.Loading -> {}
             }
         }
     }
@@ -98,10 +99,17 @@ class HomeViewModel @Inject constructor(
     fun undoDelete() {
         viewModelScope.launch {
             recentlyDeletedHabit?.let { habit ->
-                createHabitUseCase(habit)
-                recentlyDeletedHabit = null
-                _uiState.update { it.copy(deletedHabitMessage = null) }
-                updateWidget()
+                when (val result = createHabitUseCase(habit)) {
+                    is Resource.Success -> {
+                        recentlyDeletedHabit = null
+                        _uiState.update { it.copy(deletedHabitMessage = null) }
+                        updateWidget()
+                    }
+                    is Resource.Error -> {
+                        _uiState.update { it.copy(error = result.message) }
+                    }
+                    is Resource.Loading -> {}
+                }
             }
         }
     }

@@ -43,7 +43,9 @@ import androidx.compose.ui.unit.sp
 import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.Habit
+import com.fervillalba.habittracker.ui.theme.Error as AppError
 import com.fervillalba.habittracker.ui.theme.Purple
+import com.fervillalba.habittracker.ui.theme.PurpleDark
 import com.fervillalba.habittracker.ui.theme.Surface as AppSurface
 import com.fervillalba.habittracker.ui.theme.TextSecondary
 
@@ -67,8 +69,8 @@ fun HabitItem(
     }
 
     val checkScale by animateFloatAsState(
-        targetValue = if (isCompleted) 1.1f else 1f,
-        animationSpec = tween(300),
+        targetValue = if (isCompleted) Constants.Animation.ScaleChecked else Constants.Animation.ScaleNormal,
+        animationSpec = tween(Constants.Animation.DurationMedium),
         label = "check_scale"
     )
 
@@ -78,7 +80,7 @@ fun HabitItem(
         backgroundContent = {
             val color by animateColorAsState(
                 targetValue = when (dismissState.targetValue) {
-                    SwipeToDismissBoxValue.EndToStart -> Color(0xFFFF4D4D)
+                    SwipeToDismissBoxValue.EndToStart -> AppError
                     else -> Color.Transparent
                 },
                 label = "swipe_color"
@@ -104,11 +106,11 @@ fun HabitItem(
             modifier = modifier
                 .fillMaxWidth()
                 .combinedClickable(
-                    onClick = {},
+                    onClick = onDetail,
                     onLongClick = onEdit
                 ),
             shape = RoundedCornerShape(Constants.Dimens.RadiusLarge),
-            color = if (isCompleted) Color(0xFF1E1C3D) else AppSurface,
+            color = if (isCompleted) PurpleDark else AppSurface,
             tonalElevation = if (isCompleted) 0.dp else 2.dp,
             shadowElevation = if (isCompleted) 0.dp else 4.dp
         ) {
@@ -141,8 +143,8 @@ fun HabitItem(
                     ) {
                         Text(
                             text = habit.iconEmoji,
-                            fontSize = 24.sp,
-                            modifier = Modifier.scale(if (isCompleted) 0.9f else 1f)
+                            fontSize = Constants.Dimens.EmojiSizeItem,
+                            modifier = Modifier.scale(if (isCompleted) Constants.Animation.ScaleCompletedEmoji else Constants.Animation.ScaleNormal)
                         )
                     }
                     Text(
@@ -151,7 +153,7 @@ fun HabitItem(
                             fontWeight = if (isCompleted) FontWeight.Normal else FontWeight.SemiBold,
                             textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
                         ),
-                        color = if (isCompleted) Color(0xFF8E8E9F) else MaterialTheme.colorScheme.onSurface,
+                        color = if (isCompleted) TextSecondary else MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )

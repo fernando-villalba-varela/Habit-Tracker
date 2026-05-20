@@ -11,6 +11,6 @@ data class CreateHabitUiState(
     val isLoading: Boolean = false,
     val nameError: UiText? = null,
     val error: UiText? = null,
-    val reminderTime: String? = null,
+    val reminderTimes: List<String> = emptyList(),
     val showTimePicker: Boolean = false
 )

@@ -145,7 +145,7 @@ fun StatsScreen(
                                     ) {
                                         Text(
                                             text = habitStats.habit.iconEmoji,
-                                            fontSize = 24.sp
+                                            fontSize = Constants.Dimens.EmojiSizeItem
                                         )
                                     }
                                     Column {

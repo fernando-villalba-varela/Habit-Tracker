@@ -23,8 +23,8 @@ class HabitRepositoryImpl(
         return dao.getHabitById(id).map { it?.toDomain() }
     }
 
-    override suspend fun insertHabit(habit: Habit) {
-        dao.insertHabit(habit.toEntity())
+    override suspend fun insertHabit(habit: Habit): Long {
+        return dao.insertHabit(habit.toEntity())
     }
 
     override suspend fun updateHabit(habit: Habit) {

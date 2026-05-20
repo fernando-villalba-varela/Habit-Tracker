@@ -1,11 +1,12 @@
 package com.fervillalba.habittracker
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 object Constants {
     // Database
     const val DATABASE_NAME = "habit_tracker_db"
-    const val DATABASE_VERSION = 1
+    const val DATABASE_VERSION = 2
     const val TABLE_HABITS = "habits"
     const val TABLE_HABIT_LOGS = "habit_logs"
 
@@ -45,8 +46,23 @@ object Constants {
         val BorderWidth = 1.5.dp
         val ProgressHeight = 6.dp
         val DotSize = 3.dp
+
+        val EmojiSizeItem = 24.sp
+        val EmojiSizeDetail = 32.sp
     }
     
+    // Animations
+    object Animation {
+        const val DurationShort = 150
+        const val DurationMedium = 300
+        const val DurationLong = 500
+        
+        const val ScalePressed = 0.95f
+        const val ScaleChecked = 1.1f
+        const val ScaleNormal = 1f
+        const val ScaleCompletedEmoji = 0.9f
+    }
+
     // Time
     const val MILLIS_IN_DAY = 24 * 60 * 60 * 1000L
 

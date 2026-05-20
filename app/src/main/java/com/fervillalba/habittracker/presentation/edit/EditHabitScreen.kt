@@ -44,7 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.domain.model.HabitFrequency
-import com.fervillalba.habittracker.presentation.components.ReminderTimeSelector
+import com.fervillalba.habittracker.presentation.components.MultiReminderSelector
 import com.fervillalba.habittracker.ui.theme.Background
 import com.fervillalba.habittracker.ui.theme.Border
 import com.fervillalba.habittracker.ui.theme.Purple
@@ -200,11 +200,12 @@ fun EditHabitScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ReminderTimeSelector(
-                reminderTime = uiState.reminderTime,
+            MultiReminderSelector(
+                reminderTimes = uiState.reminderTimes,
                 showTimePicker = uiState.showTimePicker,
                 onShowTimePicker = viewModel::onShowTimePicker,
-                onTimeSelected = viewModel::onReminderTimeChange
+                onTimeAdded = viewModel::addReminderTime,
+                onTimeRemoved = viewModel::removeReminderTime
             )
 
             Button(

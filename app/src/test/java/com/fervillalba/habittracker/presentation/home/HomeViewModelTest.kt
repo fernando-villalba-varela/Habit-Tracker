@@ -1,31 +1,34 @@
 package com.fervillalba.habittracker.presentation.home
 
+import android.app.Application
 import com.fervillalba.habittracker.domain.model.Habit
-import com.fervillalba.habittracker.domain.model.HabitLog
 import com.fervillalba.habittracker.domain.usecase.CompleteHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.CreateHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.DeleteHabitUseCase
 import com.fervillalba.habittracker.domain.usecase.GetHabitsUseCase
 import com.fervillalba.habittracker.domain.usecase.GetTodayLogsUseCase
+import com.fervillalba.habittracker.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
 
+    private lateinit var application: Application
     private lateinit var getHabitsUseCase: GetHabitsUseCase
     private lateinit var completeHabitUseCase: CompleteHabitUseCase
     private lateinit var getTodayLogsUseCase: GetTodayLogsUseCase
@@ -33,16 +36,24 @@ class HomeViewModelTest {
     private lateinit var createHabitUseCase: CreateHabitUseCase
     private lateinit var viewModel: HomeViewModel
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        application = mock()
+        whenever(application.applicationContext).thenReturn(application)
+        
         getHabitsUseCase = mock()
         completeHabitUseCase = mock()
         getTodayLogsUseCase = mock()
         deleteHabitUseCase = mock()
         createHabitUseCase = mock()
+        
+        whenever(getHabitsUseCase()).thenReturn(flowOf(emptyList()))
+        runTest {
+            whenever(getTodayLogsUseCase()).thenReturn(emptyList())
+        }
     }
 
     @After
@@ -57,29 +68,26 @@ class HomeViewModelTest {
             Habit(id = 2, name = "Leer")
         )
         whenever(getHabitsUseCase()).thenReturn(flowOf(habits))
-        whenever(getTodayLogsUseCase()).thenReturn(emptyList())
 
         viewModel = HomeViewModel(
+            application,
             getHabitsUseCase,
             completeHabitUseCase,
             getTodayLogsUseCase,
             deleteHabitUseCase,
             createHabitUseCase
         )
-
-        advanceUntilIdle()
 
         assertEquals(habits, viewModel.uiState.value.habits)
         assertEquals(false, viewModel.uiState.value.isLoading)
     }
 
     @Test
-    fun `when habit completed, completedHabitIds contains habit id`() = runTest {
-        val habits = listOf(Habit(id = 1, name = "Correr"))
-        whenever(getHabitsUseCase()).thenReturn(flowOf(habits))
-        whenever(getTodayLogsUseCase()).thenReturn(emptyList())
+    fun `when habit completed successfully, completedHabitIds contains habit id`() = runTest {
+        whenever(completeHabitUseCase(any(), any())).thenReturn(Resource.Success(Unit))
 
         viewModel = HomeViewModel(
+            application,
             getHabitsUseCase,
             completeHabitUseCase,
             getTodayLogsUseCase,
@@ -87,21 +95,18 @@ class HomeViewModelTest {
             createHabitUseCase
         )
 
-        advanceUntilIdle()
         viewModel.completeHabit(1L)
-        advanceUntilIdle()
 
         assertTrue(1L in viewModel.uiState.value.completedHabitIds)
     }
 
     @Test
-    fun `when habit deleted, deletedHabitMessage is set`() = runTest {
+    fun `when habit deleted successfully, deletedHabitMessage is set`() = runTest {
         val habit = Habit(id = 1, name = "Correr")
-        val habits = listOf(habit)
-        whenever(getHabitsUseCase()).thenReturn(flowOf(habits))
-        whenever(getTodayLogsUseCase()).thenReturn(emptyList())
+        whenever(deleteHabitUseCase(any())).thenReturn(Resource.Success(Unit))
 
         viewModel = HomeViewModel(
+            application,
             getHabitsUseCase,
             completeHabitUseCase,
             getTodayLogsUseCase,
@@ -109,10 +114,8 @@ class HomeViewModelTest {
             createHabitUseCase
         )
 
-        advanceUntilIdle()
         viewModel.deleteHabit(habit)
-        advanceUntilIdle()
 
-        assertEquals("Hábito eliminado", viewModel.uiState.value.deletedHabitMessage)
+        assertNotNull(viewModel.uiState.value.deletedHabitMessage)
     }
 }

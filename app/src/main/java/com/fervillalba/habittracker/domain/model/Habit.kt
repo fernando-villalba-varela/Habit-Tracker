@@ -8,7 +8,7 @@ data class Habit(
     val iconEmoji: String = Constants.DEFAULT_EMOJI,
     val colorHex: String = Constants.DEFAULT_COLOR_HEX,
     val frequency: HabitFrequency = HabitFrequency.DAILY,
-    val reminderTime: String? = null,
+    val reminderTimes: List<String> = emptyList(),
     val createdAt: Long = System.currentTimeMillis(),
     val isActive: Boolean = true
 )

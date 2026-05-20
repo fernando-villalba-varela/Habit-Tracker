@@ -75,7 +75,10 @@ fun NavGraph(
 
         composable(Screen.HabitDetail.route) {
             HabitDetailScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToEdit = { habitId ->
+                    navController.navigate(Screen.EditHabit.createRoute(habitId))
+                }
             )
         }
     }

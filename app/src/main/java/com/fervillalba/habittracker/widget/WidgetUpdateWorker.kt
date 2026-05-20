@@ -37,9 +37,6 @@ class WidgetUpdateWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            // Delay para asegurar que Room haya persistido los cambios
-            delay(500)
-            
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(HabitWidget::class.java)
             

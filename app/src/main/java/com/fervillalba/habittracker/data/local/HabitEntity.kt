@@ -13,7 +13,7 @@ data class HabitEntity(
     val iconEmoji: String,
     val colorHex: String,
     val frequency: String,
-    val reminderTime: String?,
+    val reminderTimes: List<String>,
     val createdAt: Long,
     val isActive: Boolean
 )

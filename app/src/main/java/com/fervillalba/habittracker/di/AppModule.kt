@@ -7,6 +7,8 @@ import com.fervillalba.habittracker.data.local.HabitDao
 import com.fervillalba.habittracker.data.local.HabitDatabase
 import com.fervillalba.habittracker.data.repository.HabitRepositoryImpl
 import com.fervillalba.habittracker.domain.repository.HabitRepository
+import com.fervillalba.habittracker.util.DispatchersProvider
+import com.fervillalba.habittracker.util.StandardDispatchers
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +30,7 @@ object AppModule {
             HabitDatabase::class.java,
             Constants.DATABASE_NAME
         )
+            .fallbackToDestructiveMigration(true)
             .enableMultiInstanceInvalidation()
             .build()
     }
@@ -42,5 +45,11 @@ object AppModule {
     @Singleton
     fun provideHabitRepository(dao: HabitDao): HabitRepository {
         return HabitRepositoryImpl(dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDispatchersProvider(): DispatchersProvider {
+        return StandardDispatchers()
     }
 }

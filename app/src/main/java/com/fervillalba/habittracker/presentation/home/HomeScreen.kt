@@ -17,8 +17,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.EventNote
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.outlined.EventNote
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -146,12 +148,14 @@ fun HomeScreen(
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        text = getTodayDate(),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TextTertiary,
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
+                    if (uiState.habits.isNotEmpty()) {
+                        Text(
+                            text = getTodayDate(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextTertiary,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
                 }
                 IconButton(
                     onClick = onNavigateToStats,
@@ -294,23 +298,37 @@ fun HomeScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingMedium)
                         ) {
-                            Text(
-                                "🎯",
-                                fontSize = 64.sp,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(120.dp)
+                                        .clip(CircleShape)
+                                        .background(Purple.copy(alpha = 0.08f))
+                                )
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Outlined.EventNote,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp),
+                                    tint = Purple.copy(alpha = 0.6f)
+                                )
+                            }
                             Text(
                                 text = stringResource(R.string.no_habits_yet),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onBackground
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                textAlign = TextAlign.Center
                             )
                             Text(
                                 text = stringResource(R.string.click_to_create_first),
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = TextTertiary,
                                 modifier = Modifier.padding(horizontal = 48.dp),
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                lineHeight = 20.sp
                             )
                         }
                     }

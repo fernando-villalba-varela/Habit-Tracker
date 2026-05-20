@@ -15,7 +15,7 @@ object HabitMapper {
             iconEmoji = iconEmoji,
             colorHex = colorHex,
             frequency = HabitFrequency.valueOf(frequency),
-            reminderTime = reminderTime,
+            reminderTimes = reminderTimes,
             createdAt = createdAt,
             isActive = isActive
         )
@@ -28,7 +28,7 @@ object HabitMapper {
             iconEmoji = iconEmoji,
             colorHex = colorHex,
             frequency = frequency.name,
-            reminderTime = reminderTime,
+            reminderTimes = reminderTimes,
             createdAt = createdAt,
             isActive = isActive
         )

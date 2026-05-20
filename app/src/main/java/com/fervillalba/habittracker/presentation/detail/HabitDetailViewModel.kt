@@ -30,6 +30,14 @@ class HabitDetailViewModel @Inject constructor(
         loadDetail()
     }
 
+    fun deleteHabit() {
+        viewModelScope.launch {
+            _uiState.value.habit?.let {
+                repository.deleteHabit(it)
+            }
+        }
+    }
+
     private fun loadDetail() {
         viewModelScope.launch {
             try {

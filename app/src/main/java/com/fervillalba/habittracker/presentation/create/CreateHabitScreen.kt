@@ -46,12 +46,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fervillalba.habittracker.Constants
 import com.fervillalba.habittracker.R
 import com.fervillalba.habittracker.domain.model.HabitFrequency
-import com.fervillalba.habittracker.presentation.components.ReminderTimeSelector
+import com.fervillalba.habittracker.presentation.components.MultiReminderSelector
 import com.fervillalba.habittracker.ui.theme.Background
 import com.fervillalba.habittracker.ui.theme.Border
 import com.fervillalba.habittracker.ui.theme.Purple
-import com.fervillalba.habittracker.ui.theme.PurpleDark
-import com.fervillalba.habittracker.ui.theme.PurpleDim
 import com.fervillalba.habittracker.ui.theme.Surface
 import com.fervillalba.habittracker.ui.theme.TextTertiary
 
@@ -95,14 +93,14 @@ fun CreateHabitScreen(
                 .padding(paddingValues)
                 .padding(horizontal = Constants.Dimens.PaddingLarge)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingExtraLarge)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // Nombre
-            Column(verticalArrangement = Arrangement.spacedBy(Constants.Dimens.PaddingSmall)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = stringResource(R.string.habit_name_label),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Purple,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
                 )
                 OutlinedTextField(
@@ -122,7 +120,7 @@ fun CreateHabitScreen(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    shape = RoundedCornerShape(Constants.Dimens.RadiusMedium),
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Purple,
                         unfocusedBorderColor = Border,
@@ -134,61 +132,28 @@ fun CreateHabitScreen(
                 )
             }
 
-            // Emoji
-            Column(verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingMedium)) {
-                Text(
-                    text = stringResource(R.string.habit_icon_label),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Purple,
-                    fontWeight = FontWeight.Bold
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall),
-                    verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(Constants.Dimens.RadiusMedium))
-                        .background(Surface)
-                        .padding(Constants.Dimens.PaddingSmall)
-                ) {
-                    Constants.EMOJI_OPTIONS.forEach { emoji ->
-                        val isSelected = uiState.iconEmoji == emoji
-                        Box(
-                            modifier = Modifier
-                                .size(Constants.Dimens.BoxSizeEmoji)
-                                .clip(RoundedCornerShape(Constants.Dimens.RadiusSmall))
-                                .background(if (isSelected) Purple else Color.White.copy(alpha = 0.05f))
-                                .clickable { viewModel.onEmojiChange(emoji) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = emoji, fontSize = 24.sp)
-                        }
-                    }
-                }
-            }
-
             // Frecuencia
-            Column(verticalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingMedium)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = stringResource(R.string.frequency_label),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Purple,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
                 )
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(Constants.Dimens.SpacingSmall),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(Constants.Dimens.RadiusMedium))
+                        .clip(RoundedCornerShape(16.dp))
                         .background(Surface)
-                        .padding(Constants.Dimens.PaddingSmall)
+                        .padding(4.dp)
                 ) {
                     HabitFrequency.entries.forEach { frequency ->
                         val isSelected = uiState.frequency == frequency
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .clip(RoundedCornerShape(10.dp))
+                                .clip(RoundedCornerShape(12.dp))
                                 .background(if (isSelected) Purple else Color.Transparent)
                                 .clickable { viewModel.onFrequencyChange(frequency) }
                                 .padding(vertical = 12.dp),
@@ -200,7 +165,7 @@ fun CreateHabitScreen(
                                     HabitFrequency.WEEKDAYS -> stringResource(R.string.frequency_weekdays)
                                     HabitFrequency.WEEKENDS -> stringResource(R.string.frequency_weekends)
                                 },
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                 color = if (isSelected) Color.White else TextTertiary
                             )
@@ -209,29 +174,61 @@ fun CreateHabitScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            ReminderTimeSelector(
-                reminderTime = uiState.reminderTime,
+            // Recordatorios Múltiples
+            MultiReminderSelector(
+                reminderTimes = uiState.reminderTimes,
                 showTimePicker = uiState.showTimePicker,
                 onShowTimePicker = viewModel::onShowTimePicker,
-                onTimeSelected = viewModel::onReminderTimeChange
+                onTimeAdded = viewModel::addReminderTime,
+                onTimeRemoved = viewModel::removeReminderTime
             )
+
+            // Iconos
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.habit_icon_label),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Bold
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Surface)
+                        .padding(12.dp)
+                ) {
+                    Constants.EMOJI_OPTIONS.forEach { emoji ->
+                        val isSelected = uiState.iconEmoji == emoji
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (isSelected) Purple else Color.White.copy(alpha = 0.05f))
+                                .clickable { viewModel.onEmojiChange(emoji) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = emoji, fontSize = 24.sp)
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = { viewModel.createHabit(onNavigateBack) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(vertical = Constants.Dimens.PaddingSmall),
+                    .height(56.dp),
                 enabled = !uiState.isLoading,
-                shape = RoundedCornerShape(Constants.Dimens.RadiusMedium),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Purple,
-                    contentColor = Color.White,
-                    disabledContainerColor = PurpleDim.copy(alpha = 0.5f)
-                ),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                    contentColor = Color.White
+                )
             ) {
                 Text(
                     text = if (uiState.isLoading) {
@@ -243,6 +240,7 @@ fun CreateHabitScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }

@@ -2,10 +2,12 @@ package com.fervillalba.habittracker.domain.usecase
 
 import com.fervillalba.habittracker.domain.model.Habit
 import com.fervillalba.habittracker.domain.repository.HabitRepository
+import com.fervillalba.habittracker.util.Resource
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -22,22 +24,22 @@ class CreateHabitUseCaseTest {
     }
 
     @Test
-    fun `when name is blank, throws IllegalArgumentException`() = runTest {
+    fun `when name is blank, returns error resource`() = runTest {
         val habit = Habit(name = "   ")
 
-        assertThrows(IllegalArgumentException::class.java) {
-            kotlinx.coroutines.runBlocking { useCase(habit) }
-        }
+        val result = useCase(habit)
 
-        verify(repository, never()).insertHabit(habit)
+        assertTrue(result is Resource.Error)
+        verify(repository, never()).insertHabit(any())
     }
 
     @Test
-    fun `when name is valid, inserts habit`() = runTest {
+    fun `when name is valid, inserts habit and returns success`() = runTest {
         val habit = Habit(name = "Correr")
 
-        useCase(habit)
+        val result = useCase(habit)
 
+        assertTrue(result is Resource.Success)
         verify(repository).insertHabit(habit)
     }
 }

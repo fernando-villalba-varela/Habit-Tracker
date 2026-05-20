@@ -47,7 +47,7 @@ class EditHabitViewModel @Inject constructor(
                     name = habit.name,
                     iconEmoji = habit.iconEmoji,
                     frequency = habit.frequency,
-                    reminderTime = habit.reminderTime,
+                    reminderTimes = habit.reminderTimes,
                     isLoading = false
                 )
             }
@@ -66,8 +66,16 @@ class EditHabitViewModel @Inject constructor(
         _uiState.update { it.copy(frequency = frequency) }
     }
 
-    fun onReminderTimeChange(time: String?) {
-        _uiState.update { it.copy(reminderTime = time) }
+    fun addReminderTime(time: String) {
+        _uiState.update { state ->
+            if (!state.reminderTimes.contains(time)) {
+                state.copy(reminderTimes = (state.reminderTimes + time).sorted())
+            } else state
+        }
+    }
+
+    fun removeReminderTime(time: String) {
+        _uiState.update { it.copy(reminderTimes = it.reminderTimes - time) }
     }
 
     fun onShowTimePicker(show: Boolean) {
@@ -95,21 +103,18 @@ class EditHabitViewModel @Inject constructor(
                         name = state.name.trim(),
                         iconEmoji = state.iconEmoji,
                         frequency = state.frequency,
-                        reminderTime = state.reminderTime
+                        reminderTimes = state.reminderTimes
                     )
                 )
 
-                if (state.reminderTime != null) {
+                // Actualizar recordatorios (esto podría ser más complejo si queremos reprogramar todos)
+                WorkManagerHelper.cancelHabitReminder(getApplication(), habitId)
+                state.reminderTimes.forEach { time ->
                     WorkManagerHelper.scheduleHabitReminderAtTime(
                         context = getApplication(),
                         habitId = habitId,
                         habitName = state.name,
-                        reminderTime = state.reminderTime
-                    )
-                } else {
-                    WorkManagerHelper.cancelHabitReminder(
-                        context = getApplication(),
-                        habitId = habitId
+                        reminderTime = time
                     )
                 }
 
